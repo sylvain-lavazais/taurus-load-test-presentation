@@ -1,0 +1,9 @@
+body:after {
+    content: url(../img/my-logo.png);
+    opacity: 0.1;
+    font-size: 10px;
+    position: fixed;
+    bottom: 3em;
+    left: 3em;
+    width: 1em;
+}

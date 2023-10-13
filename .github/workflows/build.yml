@@ -1,0 +1,30 @@
+name: Continuous Integration
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+jobs:
+  build:
+    name: export pdf And bump version
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+      - name: Generate PDF from presentation
+        run: |
+          make export-pdf
+      - name: Semantic Release
+        uses: cycjimmy/semantic-release-action@v2
+        with:
+          semantic_version: 22.0.5
+          extra_plugins: |
+            @semantic-release/commit-analyzer
+            @semantic-release/release-notes-generator
+            @semantic-release/changelog
+            @semantic-release/github
+            @semantic-release/git
+        env:
+          GH_TOKEN: ${{ secrets.CI_TOKEN }}
