@@ -22,14 +22,14 @@ export-pdf: .clean-presentation .prepare-print ## Export presentation to pdf (us
 .PHONY: export-pdf
 
 .prepare-print:
-	@cp Presentation/style/print-options.json Presentation/reveal.json
+	@cp presentation/style/print-options.json presentation/reveal.json
 .PHONY: .prepare-print
 
 .clean-presentation:
 	@docker stop reveal-md || true
 	@docker rm reveal-md || true
 	@rm -rf generation_tmp || true
-	@rm -rf Presentation/reveal.json || true
+	@rm -rf presentation/reveal.json || true
 .PHONY: .clean-presentation
 
 ##  ----
