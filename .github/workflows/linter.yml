@@ -1,0 +1,30 @@
+on:
+  pull_request:
+    types: [ 'opened', 'synchronize', 'reopened' ]
+
+name: 'Lint code base'
+
+jobs:
+  linter:
+    name: 'Super Linter'
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: 'actions/checkout@v3'
+        with:
+          fetch-depth: 0
+
+      # using slim image (less heavy)
+      # unsupported linters
+      #  - `rust` linters
+      #  - `dotenv` linters
+      #  - `armttk` linters
+      #  - `pwsh` linters
+      #  - `c#` linters
+      - name: 'Lint Code base'
+        uses: 'github/super-linter/slim@v5'
+        env:
+          VALIDATE_ALL_CODEBASE: 'false'
+          VALIDATE_PYTHON_BLACK: 'false'
+          VALIDATE_PYTHON_MYPY: 'false'
+          DEFAULT_BRANCH: 'main'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
