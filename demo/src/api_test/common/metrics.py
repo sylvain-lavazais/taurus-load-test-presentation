@@ -33,14 +33,15 @@ class Metrics:
         self._set_a_new_basic_gauge(
                 'python_gc_enabled',
                 'Whether the garbage collector is enabled.',
+                'isEnabled',
                 gc.isenabled,
         )
         self._set_a_new_basic_gauge(
                 'python_gc_debug',
                 'The debug flags currently set on the Python GC.',
+                'debug',
                 gc.get_debug,
         )
-
         self._set_a_new_multilabel_gauge(
                 'python_gc_count',
                 'Count of objects tracked by the Python garbage collector, by generation.',
@@ -92,13 +93,15 @@ class Metrics:
                 registry=core.REGISTRY,
         )
 
-    def _set_a_new_basic_gauge(self, name: str, documentation: str, function: any):
+    def _set_a_new_basic_gauge(self, name: str, documentation: str, value: str,  function: any):
         basic_gauge = Gauge(
                 name,
                 documentation,
                 ['generation'],
+                _labelvalues=[value],
                 registry=core.REGISTRY,
                 multiprocess_mode='livesum',
+
         )
         basic_gauge.set_function(function)
 

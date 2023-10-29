@@ -1,3 +1,4 @@
+import signal
 import socket
 import time
 from multiprocessing import Manager
@@ -6,6 +7,10 @@ from threading import Thread
 import falcon
 import psutil
 import structlog
+from dynaconf import LazySettings
+from structlog.typing import FilteringBoundLogger
+
+from ..repositories.postgres import Postgres
 
 MEMORY = 'memory'
 CPU = 'cpu'
@@ -18,36 +23,45 @@ STATUS = 'status'
 
 
 class HealthService(Thread):
-    """ Health probe class """
+    """
+    Health probe class
+    """
+    _dal: Postgres
+    _log: FilteringBoundLogger
+    _interrupt: bool
 
-    def __init__(self, dal):
-        self._logger = structlog.get_logger()
+    @property
+    def interrupt(self) -> bool:
+        return self._interrupt
+    
+    @interrupt.setter
+    def interrupt(self, value: bool):
+        self._interrupt = value
+
+    def __init__(self, data_access_layer: Postgres, settings: LazySettings):
+        self._log = structlog.get_logger()
         Thread.__init__(self)
 
         manager = Manager()
 
-        self.dal = dal
-        # TODO: to set back in dynaconf settings
-        # self.cpu_limit = settings.MONITORING_CPU_LIMIT
-        # self.memory_limit = settings.MONITORING_MEMORY_LIMIT
-        # self.dns_host = settings.MONITORING_DNS_LOOKUP_URL
-        # self.postgres_host = settings.POSTGRES_HOST
-        # self.postgres_pool_limit = settings.MONITORING_DB_POOL_LIMIT
-        # self.postgres_pool_max = settings.POSTGRES_POOL_MAX_SIZE
-        self.cpu_limit = 90
-        self.memory_limit = 90
-        self.dns_host = 'dns.google'
-        self.postgres_host = 'localhost'
-        self.postgres_pool_limit = 10
-        self.postgres_pool_max = 1
+        self._interrupt = False
+        self._dal = data_access_layer
+        self.cpu_limit = settings.monitoring_cpu_limit
+        self.memory_limit = settings.monitoring_memory_limit
+        self.dns_host = settings.monitoring_dns_lookup
+        self.postgres_host = settings.db_host_name
+        self.postgres_pool_limit = settings.monitoring_db_pool_limit
+        self.postgres_pool_max = settings.db_pool_max_connection
 
-        self.readiness_probes = {DNS: self.__check_dns_probe__,
-                                 POSTGRES: self.__check_postgres_probe__}
+        self.readiness_probes = {
+                DNS     : self.__check_dns_probe__,
+                POSTGRES: self.__check_postgres_probe__
+        }
 
         self.liveness_probes = {
-            MEMORY: self.__check_memory_probe__,
-            CPU: self.__check_cpu_probe__,
-            POSTGRES_POOL: self.__check_postgres_pool_probe
+                MEMORY       : self.__check_memory_probe__,
+                CPU          : self.__check_cpu_probe__,
+                POSTGRES_POOL: self.__check_postgres_pool_probe
         }
 
         self.__probes__ = manager.dict()
@@ -55,15 +69,19 @@ class HealthService(Thread):
         self.liveness_checks = manager.dict()
 
     def run(self):
+        self._log.debug('Starting health service')
         while True:
             self.__update_probes__()
             time.sleep(10)
+            if self._interrupt:
+                self._log.debug('Interruption detected')
+                break
 
-    def get_readiness_checks(self):
+    def get_readiness_checks(self) -> dict:
         """ Returns health readiness checks """
         return self.readiness_checks.copy()
 
-    def get_liveness_checks(self):
+    def get_liveness_checks(self) -> dict:
         """ Returns health liveness checks """
         return self.liveness_checks.copy()
 
@@ -82,8 +100,8 @@ class HealthService(Thread):
         self.__probes__[MEMORY] = psutil.virtual_memory().percent
         self.__probes__[CPU] = psutil.cpu_percent()
         self.__probes__[DNS] = OK if dns_lookup is not None else KO
-        self.__probes__[POSTGRES] = OK if self.dal.ping_select() else KO
-        self.__probes__[POSTGRES_POOL] = self.dal.get_used_connections()
+        self.__probes__[POSTGRES] = OK if self._dal.ping_select() else KO
+        self.__probes__[POSTGRES_POOL] = self._dal.get_used_connections()
 
     def __set_readiness_checks__(self):
         check_probes(self.readiness_probes, self.readiness_checks)
@@ -108,7 +126,7 @@ class HealthService(Thread):
             raise HealthProbeError("Could not resolve postgres")
 
     def __check_postgres_pool_probe(self):
-        pool_size = self.__probes__[POSTGRES_POOL] * 100
+        pool_size = self.__probes__[POSTGRES_POOL]
         if pool_size / self.postgres_pool_max > self.postgres_pool_limit:
             raise HealthProbeError("Used database connections above the limit")
 

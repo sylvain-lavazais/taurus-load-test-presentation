@@ -1,7 +1,8 @@
 import falcon
+import pkg_resources
 from prometheus_client import generate_latest, CollectorRegistry, multiprocess
 
-from mirror_reader.handler.handler import Handler
+from .handler import Handler
 
 
 class MonitoringHandler(Handler):
@@ -17,7 +18,8 @@ class MonitoringHandler(Handler):
             registry = CollectorRegistry()
             multiprocess.MultiProcessCollector(registry)
             data = generate_latest(registry)
-            res.content_type = 'text/plain; version = 0.0.4; charset = utf-8'
-            res.body = str(data.decode('utf-8'))
+            res.content_type = (f'text/plain; version = {pkg_resources.get_distribution("api_test").version}'
+                                f'; charset = utf-8')
+            res.text = str(data.decode('utf-8'))
         except Exception as err:
-            res.body, res.status = self.handle_generic_error(err)
+            res.text, res.status = self.handle_generic_error(err)

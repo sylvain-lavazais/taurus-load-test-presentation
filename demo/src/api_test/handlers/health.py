@@ -1,19 +1,23 @@
-import falcon
+from falcon import HTTP_200, HTTP_503, request, response, Response, Request, HTTP_204
+from structlog.typing import FilteringBoundLogger
 
-from mirror_reader.handler.handler import Handler
-from mirror_reader.model.health import HealthSchema, ReadinessSchema, LivenessSchema
+from .handler import Handler
+from ..model.health import HealthSchema, ReadinessSchema, LivenessSchema
+from ..services.health import HealthService
 
 
 class HealthHandler(Handler):
     """
     Health resource
     """
+    _log: FilteringBoundLogger
+    _health_service: HealthService
 
-    def __init__(self, health_service):
+    def __init__(self, health_service: HealthService):
         Handler.__init__(self, {'Health': HealthSchema()})
-        self.health_service = health_service
+        self._health_service = health_service
 
-    def on_get(self, _, res):
+    def on_get(self, _: Request, res: Response):
         """Handles health GET requests.
         ---
         description: Get the health status
@@ -29,19 +33,35 @@ class HealthHandler(Handler):
         """
         try:
             if self._check_health_probe():
-                res.status = falcon.HTTP_200
-                res.body = HealthSchema().dumps({'alive': True}).data
+                self._log.debug('check ok')
+                res.status = HTTP_200
+                res.text = HealthSchema().dumps({'alive': True})
             else:
-                res.status = falcon.HTTP_503
-                res.body = HealthSchema().dumps({'alive': False}).data
+                self._log.debug('check ko')
+                res.status = HTTP_503
+                res.text = HealthSchema().dumps({'alive': False})
         except Exception as err:
-            res.body, res.status = self.handle_generic_error(err)
+            res.text, res.status = self.handle_generic_error(err)
+
+    def on_delete(self, _: Request, res: Response):
+        """Handles health DELETE requests.
+        ---
+        description: Stop the health service
+        responses:
+            204:
+                description: 'NO CONTENT'
+        """
+        try:
+            self._health_service.interrupt = True
+            res.status = HTTP_204
+        except Exception as err:
+            res.text, res.status = self.handle_generic_error(err)
 
     def _check_health_probe(self) -> bool:
-        readiness_probes = self.health_service.get_readiness_checks()
-        liveness_probes = self.health_service.get_liveness_checks()
-        is_rdy = readiness_probes['status'] == falcon.HTTP_200
-        is_live = liveness_probes['status'] == falcon.HTTP_200
+        readiness_probes = self._health_service.get_readiness_checks()
+        liveness_probes = self._health_service.get_liveness_checks()
+        is_rdy = readiness_probes['status'] == HTTP_200
+        is_live = liveness_probes['status'] == HTTP_200
         return is_rdy and is_live
 
 
@@ -49,12 +69,14 @@ class ReadinessHandler(Handler):
     """
     Readiness resource
     """
+    _log: FilteringBoundLogger
+    _health_service: HealthService
 
-    def __init__(self, health_service):
+    def __init__(self, health_service: HealthService):
         Handler.__init__(self, {'Readiness': ReadinessSchema()})
-        self.health_service = health_service
+        self._health_service = health_service
 
-    def on_get(self, _, res):
+    def on_get(self, _: Request, res: Response):
         """Handles health readiness GET requests.
         ---
         description: Get the health readiness probes
@@ -69,23 +91,25 @@ class ReadinessHandler(Handler):
                     $ref: '#/definitions/Readiness'
         """
         try:
-            readiness_probes = self.health_service.get_readiness_checks()
+            readiness_probes = self._health_service.get_readiness_checks()
             res.status = readiness_probes.pop('status')
-            res.body = ReadinessSchema().dumps(readiness_probes).data
+            res.text = ReadinessSchema().dumps(readiness_probes)
         except Exception as err:
-            res.body, res.status = self.handle_generic_error(err)
+            res.text, res.status = self.handle_generic_error(err)
 
 
 class LivenessHandler(Handler):
     """
     Liveness resource
     """
+    _log: FilteringBoundLogger
+    _health_service: HealthService
 
-    def __init__(self, health_service):
+    def __init__(self, health_service: HealthService):
         Handler.__init__(self, {'Liveness': LivenessSchema()})
-        self.health_service = health_service
+        self._health_service = health_service
 
-    def on_get(self, _, res):
+    def on_get(self, _: Request, res: Response):
         """Handles health liveness GET requests.
         ---
         description: Get the health liveness probes
@@ -100,8 +124,8 @@ class LivenessHandler(Handler):
                     $ref: '#/definitions/Liveness'
         """
         try:
-            liveness_probes = self.health_service.get_liveness_checks()
+            liveness_probes = self._health_service.get_liveness_checks()
             res.status = liveness_probes.pop('status')
-            res.body = LivenessSchema().dumps(liveness_probes).data
+            res.text = LivenessSchema().dumps(liveness_probes)
         except Exception as err:
-            res.body, res.status = self.handle_generic_error(err)
+            res.text, res.status = self.handle_generic_error(err)
