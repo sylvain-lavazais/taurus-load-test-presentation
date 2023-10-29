@@ -1,5 +1,8 @@
 -include .env
 PWD=$(shell pwd)
+.DEFAULT_GOAL := help
+APPLICATION_TITLE := API - test \n ==========
+MODULE_NAME := api-test
 
 ##  -------
 ##@ Install
@@ -21,12 +24,12 @@ install: .revolve-dep ## Install application
 
 install-test: install ## Install application and tests modules
 	@echo "===> $@ <==="
-	@pip install awx-synchronizer\[test\]
+	@pip install ${MODULE_NAME}\[test\]
 .PHONY: install-test
 
 install-all: install install-test ## Install all application dependencies
 	@echo "===> $@ <==="
-	@pip install awx-synchronizer\[dev\]
+	@pip install ${MODULE_NAME}\[dev\]
 .PHONY: install-all
 
 build: .revolve-dep ## Build the application
@@ -38,6 +41,27 @@ prepare-release: ## Prepare files before making a new release of version
 	@echo "===> $@ <==="
 	@sed -Ei 's/version = .*/version = "${VERSION}"/g' pyproject.toml
 .PHONY: prepare-release
+
+##  -------
+##@ Stack
+##  -------
+
+start-reset-docker: .reset-docker ## reset volume and start the docker compose stack
+	@echo "===> $@ <==="
+	@docker volume create db-vol
+	@docker compose up -d
+.PHONY: start-reset-docker
+
+start-docker: ## start the docker compose stack
+	@echo "===> $@ <==="
+	@docker compose up -d
+.PHONY: start-docker
+
+.reset-docker:
+	@echo "===> $@ <==="
+	@docker compose down -v
+	@docker volume rm db-vol || true
+.PHONY: .reset-docker
 
 ##  -------
 ##@ Test
@@ -87,8 +111,6 @@ check-linter: ## Run flake8 linter on sources
 	@$(eval export $(shell sed -ne 's/ *#.*$$//; /./ s/=.*$$// p' .env))
 .PHONY: .export-env
 
-.DEFAULT_GOAL := help
-APPLICATION_TITLE := API - test \n ==========
 .PHONY: help
 # See https://www.thapaliya.com/en/writings/well-documented-makefiles/
 help: ## Display this help

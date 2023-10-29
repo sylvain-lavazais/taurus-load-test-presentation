@@ -1,21 +1,26 @@
-import falcon
-import structlog
+from types import TracebackType
 
-from mirror_reader.model.errors import GenericErrorPayloadSchema
+import structlog
+from falcon import HTTP_500
+from structlog.typing import FilteringBoundLogger
+
+from ..model.errors import GenericErrorPayloadSchema
 
 
 class Handler:
     """
     Generic resource class.
     """
+    _log: FilteringBoundLogger
+    _schemas: dict
 
-    def __init__(self, schemas=None):
-        self.schemas = schemas
-        self._logger = structlog.get_logger()
+    def __init__(self, schemas: dict = None):
+        self._schemas = schemas
+        self._log = structlog.get_logger()
 
-    def handle_generic_error(self, err) -> (any, str):
+    def handle_generic_error(self, err: Exception) -> (any, str):
         error = dict()
         error['message'] = str(err)
-        error['error_status'] = falcon.HTTP_500
-        self._logger.error(err)
-        return GenericErrorPayloadSchema().dumps(error).data, falcon.HTTP_500
+        error['error_status'] = HTTP_500
+        self._log.exception('generic error handling')
+        return GenericErrorPayloadSchema().dumps(error), HTTP_500
