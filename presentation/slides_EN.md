@@ -39,12 +39,30 @@ Note:
 
 <!--h-->
 
-## What is performance testing
+### What is performance testing?
 
-Schematic represent an application on test bench
+<img src="img/what-is-perf-1.png" alt="drawing" width="500"/>
 
 Note:
-Performance testing is the ability to put an application in a "real-life" or a virtual context and observe how it behave.
+Performance testing is the ability to put an application, with all its dependencies, in a "real-life" or a virtual 
+context and observe how they behave.
+<!--v-->
+
+### What is performance testing?
+
+<div>
+responses over time<br/>
+<img src="img/what-is-perf-response-time.jpeg" alt="drawing" width="300"/>
+</div>
+
+Note:
+Performance testing provides direct and non-direct benefits such as:
+ - responses over time (direct)
+ - ressources utilization (direct)
+ - capacity to adapt / scalability (direct)
+ - prevent downtime (non-direct)
+ - detecting uncovered bugs / bottleneck (non-direct)
+ - mitigate security breach (non-direct)
 <!--v-->
 
 ### Element 2
