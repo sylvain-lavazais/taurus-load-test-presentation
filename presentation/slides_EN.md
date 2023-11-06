@@ -148,6 +148,10 @@ in build context, this test can be used to monitor the application response time
 ![](img/what-tests-stress-test.png)
 
 Note:
+This kind of test is designed to determine the response limit for the tested application and/or the application 
+dependencies.
+
+(schema to redo)
 
 <!--v-->
 
@@ -156,6 +160,8 @@ Note:
 ![](img/what-tests-spike-test.png)
 
 Note:
+The spike testing aims to determine the performance issues when dramatic changes occur with application, like a large
+amount of user connect at the same-time or a large fewer of users that disconnect.
 
 <!--v-->
 
@@ -164,11 +170,23 @@ Note:
 ![](img/what-tests-breakpoint-test.png)
 
 Note:
+This kind of test is to evaluate the load and the time when the tested application will fail.
+Breakpoint testing is often referred to as Capacity testing because it can be use to determine if the 
+SLA (Service Level Agreement) can be managed by the tested application.
 
 <!--v-->
 
 ### soaking testing
 
 ![](img/what-tests-soaking-test.png)
+
+Note:
+The soaking testing or the "Endurance Testing" is done to determine if the tested application can sustain a continuous 
+load during a tremendous amount of time.
+Like load testing, the application dependencies infrastructure services should also be monitored during the test.
+
+<!--h-->
+
+### Test with Taurus By Blazemeter
 
 Note:
