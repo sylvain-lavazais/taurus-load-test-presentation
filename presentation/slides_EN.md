@@ -124,8 +124,8 @@ next, we're going to see the difference between test kinds, they can be applied
 ![](img/what-tests-isolation-test.png)
 
 Note:
-this kind of test is to perform on a test bench (an isolated test case / context) by repeating test execution.
-
+This test kind is practice on a test bench (to isolate the case / context) by repeating test execution.
+The main objective is to compare execution results between them.
 The tested part can be a bunch of code, or an isolated system.
 
 <!--v-->
@@ -135,14 +135,19 @@ The tested part can be a bunch of code, or an isolated system.
 ![](img/what-tests-load-test.png)
 
 Note:
-The load test is the simplest way to test an application. 
-The objective is to check if the application can manage the limit that has been decided before the test.
-The application dependencies infrastructure services should also be monitored during the test.
 
-in build context, this test can be used to monitor the application response time, and the objective to maintain.
+
+Ce type de test peut être utilisé comme un reporting de qualité d'une release à une autre, ainsi qu'un objectif à maintenir.
+
+The load test is the simplest way to test an application. 
+The objective is to check if the application can manage response time and resources consumption limits that have been
+decided previously (by SLA for example)
+The infrastructure services should also be monitored during the test.
+
+This test kind can be used as quality report to evaluate and compare a release from another.
 
 <!--v-->
-
+   
 ### stress testing
 
 ![](img/what-tests-stress-test.png)
@@ -150,8 +155,6 @@ in build context, this test can be used to monitor the application response time
 Note:
 This kind of test is designed to determine the response limit for the tested application and/or the application 
 dependencies.
-
-(schema to redo)
 
 <!--v-->
 
