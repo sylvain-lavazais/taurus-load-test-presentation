@@ -2,7 +2,7 @@ import falcon
 import pkg_resources
 from prometheus_client import generate_latest, CollectorRegistry, multiprocess
 
-from .handler import Handler
+from . import Handler
 
 
 class MonitoringHandler(Handler):

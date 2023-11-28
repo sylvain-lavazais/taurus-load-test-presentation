@@ -2,7 +2,7 @@ import structlog
 from falcon import HTTP_500
 from structlog.typing import FilteringBoundLogger
 
-from ..model.errors import GenericErrorPayloadSchema
+from ..models.errors import GenericErrorPayloadSchema
 
 
 class Handler:

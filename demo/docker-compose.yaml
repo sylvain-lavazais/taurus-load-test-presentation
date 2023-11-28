@@ -14,14 +14,14 @@ services:
     networks:
       - test-net
 
-  app:
-    image: docker.io/library/api-test:latest
-    environment:
-      API_DB_USER_PASSWORD: 'dbpass'
-    ports:
-      - '8080:8080'
-    networks:
-      - test-net
+#  app:
+#    image: docker.io/library/api-test:latest
+#    environment:
+#      API_DB_USER_PASSWORD: 'dbpass'
+#    ports:
+#      - '8080:8080'
+#    networks:
+#      - test-net
 
 networks:
   test-net:

@@ -3,16 +3,16 @@ import time
 import falcon
 import structlog
 
-from ..common.metrics import Metrics
+from ..commons.metrics import Metrics
 
 
 class Prometheus:
     def __init__(self, prometheus: Metrics):
         self._excluded_resources = (
-            '/_private/_liveness',
-            '/_private/_readiness',
-            '/_private/_metrics'
-            '/_health',
+                '/_private/_liveness',
+                '/_private/_readiness',
+                '/_private/_metrics'
+                '/_health',
         )
         self._logger = structlog.get_logger('falcon')
         self._prometheus = prometheus
@@ -46,7 +46,7 @@ class Prometheus:
         self._prometheus.requests.labels(method=req.method, path=req.path,
                                          status=resp.status).inc()
         self._prometheus.request_historygram.labels(
-            method=req.method,
-            path=req.path,
-            status=resp.status,
+                method=req.method,
+                path=req.path,
+                status=resp.status,
         ).observe(resp_time)

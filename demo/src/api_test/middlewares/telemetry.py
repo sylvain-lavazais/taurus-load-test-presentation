@@ -8,10 +8,10 @@ class Telemetry:
     def __init__(self):
         self._logger = structlog.get_logger('falcon')
         self._excluded_resources = (
-            '/_health',
-            '/_private/_liveness',
-            '/_private/_readiness',
-            '/_private/_metrics',
+                '/_health',
+                '/_private/_liveness',
+                '/_private/_readiness',
+                '/_private/_metrics',
         )
 
     def process_request(self, req: falcon.Request, _: falcon.Response) -> None:
@@ -29,13 +29,13 @@ class Telemetry:
             req.context['received_at'] = datetime.now()
             self._logger.info("Request received",
                               http={
-                                  'method': req.method,
-                                  'url_details': {
-                                      'path': req.path,
-                                      'host': req.netloc,
-                                      'queryString': req.params,
-                                      'scheme': req.scheme
-                                  }
+                                      'method'     : req.method,
+                                      'url_details': {
+                                              'path'       : req.path,
+                                              'host'       : req.netloc,
+                                              'queryString': req.params,
+                                              'scheme'     : req.scheme
+                                      }
                               })
 
     def process_response(self, req: falcon.Request, resp: falcon.Response, _, __) -> None:
@@ -57,16 +57,16 @@ class Telemetry:
                 pass  # intentionally ignore
 
             duration_time = int(
-                (datetime.now() - req.context['received_at']).total_seconds() * 1000000)
+                    (datetime.now() - req.context['received_at']).total_seconds() * 1000000)
             self._logger.info("Request completed",
                               http={
-                                  'method': req.method,
-                                  'url_details': {
-                                      'path': req.path,
-                                      'host': req.netloc,
-                                      'queryString': req.params,
-                                      'scheme': req.scheme,
-                                      'status_code': status
-                                  }
+                                      'method'     : req.method,
+                                      'url_details': {
+                                              'path'       : req.path,
+                                              'host'       : req.netloc,
+                                              'queryString': req.params,
+                                              'scheme'     : req.scheme,
+                                              'status_code': status
+                                      }
                               },
                               duration=duration_time)
