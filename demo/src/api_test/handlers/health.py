@@ -1,8 +1,8 @@
-from falcon import HTTP_200, HTTP_503, request, response, Response, Request, HTTP_204
+from falcon import HTTP_200, HTTP_503, Response, Request, HTTP_204
 from structlog.typing import FilteringBoundLogger
 
 from . import Handler
-from ..model.health import HealthSchema, ReadinessSchema, LivenessSchema
+from ..models.health import HealthSchema, ReadinessSchema, LivenessSchema
 from ..services.health import HealthService
 
 
@@ -103,11 +103,11 @@ class LivenessHandler(Handler):
     Liveness resource
     """
     _log: FilteringBoundLogger
-    _health_service: HealthService
+    _svc: HealthService
 
     def __init__(self, health_service: HealthService):
         Handler.__init__(self, {'Liveness': LivenessSchema()})
-        self._health_service = health_service
+        self._svc = health_service
 
     def on_get(self, _: Request, res: Response):
         """Handles health liveness GET requests.
@@ -124,7 +124,7 @@ class LivenessHandler(Handler):
                     $ref: '#/definitions/Liveness'
         """
         try:
-            liveness_probes = self._health_service.get_liveness_checks()
+            liveness_probes = self._svc.get_liveness_checks()
             res.status = liveness_probes.pop('status')
             res.text = LivenessSchema().dumps(liveness_probes)
         except Exception as err:

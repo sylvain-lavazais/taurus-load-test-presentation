@@ -93,7 +93,7 @@ class Metrics:
                 registry=core.REGISTRY,
         )
 
-    def _set_a_new_basic_gauge(self, name: str, documentation: str, value: str,  function: any):
+    def _set_a_new_basic_gauge(self, name: str, documentation: str, value: str, function: any):
         basic_gauge = Gauge(
                 name,
                 documentation,

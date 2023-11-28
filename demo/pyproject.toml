@@ -106,7 +106,8 @@ dependencies = [# Optional
     "psycopg2-binary==2.9.*", # Database driver (postreSql) needed for psycopg2 lib
     "psycopg2==2.9.*", # Database access (postgreSql)
     "yoyo-migrations==8.2.*", # Database schema migration
-    "apispec==6.3.*" # OpenAPI spec code inspection
+    "apispec==6.3.*", # OpenAPI spec code inspection
+    "decohints==1.0.*" # Decorator hints
 ]
 
 # List additional groups of dependencies here (e.g. development

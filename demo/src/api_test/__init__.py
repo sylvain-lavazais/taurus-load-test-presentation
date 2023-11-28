@@ -11,17 +11,21 @@ from dynaconf import Dynaconf, LazySettings
 from falcon import App
 from structlog.typing import FilteringBoundLogger
 
-from .common.metrics import Metrics
+from .commons.metrics import Metrics
 from .handlers.health import HealthHandler, ReadinessHandler, LivenessHandler
+from .handlers.message import MessageKeyHandler
 from .handlers.monitoring import MonitoringHandler
-from .middleware.prometheus import Prometheus
-from .middleware.telemetry import Telemetry
-from .middleware.tracking_id import TrackingId
-from .repositories.postgres import Postgres
+from .middlewares.prometheus import Prometheus
+from .middlewares.telemetry import Telemetry
+from .middlewares.tracking_id import TrackingId
+from .adapters.postgres import Postgres
+from .repositories.message import MessageRepository
 from .services.health import HealthService
+from .services.message import MessageService
 
 
 class APITest:
+    _message_service: MessageService
     _health_service: HealthService
     _log: FilteringBoundLogger
     _settings: LazySettings
@@ -32,6 +36,7 @@ class APITest:
         self._settings = self.__init_configuration(config_file)
         dal = self.__init_database(self._settings)
         self._health_service = HealthService(dal, self._settings)
+        self._message_service = MessageService(MessageRepository(dal))
 
     def __init_database(self, settings: LazySettings) -> Postgres:
         self._log.debug(f'Initialize Database component on {settings.db_host_name} - Start')
@@ -40,8 +45,8 @@ class APITest:
                                  settings.db_database_name,
                                  settings.db_user_name,
                                  settings.db_user_password,
-                                 settings.db_pool_min_connection,
-                                 settings.db_pool_max_connection)
+                                 pool_min_connection=settings.db_pool_min_connection,
+                                 pool_max_connection=settings.db_pool_max_connection)
         self._log.debug(f'Initialize Database component on {settings.db_host_name} - Done')
         return dal
 
@@ -78,7 +83,10 @@ class APITest:
             router.add_route('/_health', HealthHandler(self._health_service))
             router.add_route('/_private/_readiness', ReadinessHandler(self._health_service))
             router.add_route('/_private/_liveness', LivenessHandler(self._health_service))
-        router.add_route('/_private/_metrics', MonitoringHandler())
+            router.add_route('/_private/_metrics', MonitoringHandler())
+
+        # Message
+        router.add_route('/message/{key}', MessageKeyHandler(self._message_service))
 
         return router
 
@@ -134,7 +142,7 @@ def command_line(hostname: str,
             'keepalive'   : '2',
             'timeout'     : '120',
             'worker_class': 'gthread',
-            'logger_class': 'api_test.common.gunicorn_logger.GunicornLogger'
+            'logger_class': 'api_test.commons.gunicorn_logger.GunicornLogger'
     }
 
     app: APITest = APITest(log_level, config_file)

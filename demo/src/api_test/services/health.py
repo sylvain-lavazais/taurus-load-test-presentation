@@ -10,7 +10,7 @@ import structlog
 from dynaconf import LazySettings
 from structlog.typing import FilteringBoundLogger
 
-from ..repositories.postgres import Postgres
+from ..adapters.postgres import Postgres
 
 MEMORY = 'memory'
 CPU = 'cpu'

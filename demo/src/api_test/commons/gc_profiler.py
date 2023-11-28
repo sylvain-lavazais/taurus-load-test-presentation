@@ -1,5 +1,3 @@
-import gc
-import platform
 import time
 
 from prometheus_client import core, Gauge
@@ -35,6 +33,3 @@ def set_function_on_map_gauge(gauge: Gauge, label_values: tuple, fn: any):
             return fnc()[v]
 
         gauge.labels(generation=val).set_function(get_item)
-
-
-
