@@ -1,7 +1,7 @@
 from falcon import HTTP_200, HTTP_503, request, response, Response, Request, HTTP_204
 from structlog.typing import FilteringBoundLogger
 
-from .handler import Handler
+from . import Handler
 from ..model.health import HealthSchema, ReadinessSchema, LivenessSchema
 from ..services.health import HealthService
 
