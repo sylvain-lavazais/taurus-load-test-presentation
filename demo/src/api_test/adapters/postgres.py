@@ -9,7 +9,7 @@ from psycopg2.pool import ThreadedConnectionPool
 from structlog.typing import FilteringBoundLogger
 from yoyo import get_backend, read_migrations
 
-from .errors.postgres_errors import PostgresConnectionError, PostgresCursorError
+from .errors.postgres_errors import PostgresConnectionError, PostgresCursorError, PostgresQueryError
 from .. import db
 
 
@@ -121,12 +121,13 @@ class Postgres:
             finally:
                 self._connection_pool.putconn(conn)
 
-    def exec_db_write(self, entity: str, query: str, params: dict) -> None:
+    def exec_write(self, entity: str, query: str, params: dict) -> None:
         """
         execute a writing query on postgres database
         :param entity: entity that will be queried (or a scope, if there are more than one)
         :param query: query to be executed
         :param params: optional parameter to fulfill the query
+        :raise PostgresQueryError: on error during writing process
         """
         log_query = query.replace('\n', '')
         with self.__connection(f'write-{entity}') as conn:
@@ -138,6 +139,7 @@ class Postgres:
             except psycopg2.Error as error:
                 self._log.error(f'Error occur on write of {log_query} - {error}')
                 conn.rollback()
+                raise PostgresQueryError(f'Error occur on write of {log_query} - {error}')
             finally:
                 self._connection_pool.putconn(conn)
 

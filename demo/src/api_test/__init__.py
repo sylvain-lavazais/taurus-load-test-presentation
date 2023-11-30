@@ -13,7 +13,7 @@ from structlog.typing import FilteringBoundLogger
 
 from .commons.metrics import Metrics
 from .handlers.health import HealthHandler, ReadinessHandler, LivenessHandler
-from .handlers.message import MessageKeyHandler
+from .handlers.message import MessageKeyHandler, MessageHandler
 from .handlers.monitoring import MonitoringHandler
 from .middlewares.prometheus import Prometheus
 from .middlewares.telemetry import Telemetry
@@ -33,8 +33,10 @@ class APITest:
     def __init__(self, log_level: str, config_file: str):
         self.__init_logger(log_level)
         self._log = structlog.get_logger()
+
         self._settings = self.__init_configuration(config_file)
         dal = self.__init_database(self._settings)
+
         self._health_service = HealthService(dal, self._settings)
         self._message_service = MessageService(MessageRepository(dal))
 
@@ -86,7 +88,11 @@ class APITest:
             router.add_route('/_private/_metrics', MonitoringHandler())
 
         # Message
+        # GET, PUT, DELETE
         router.add_route('/message/{key}', MessageKeyHandler(self._message_service))
+        router.add_route('/message', MessageHandler(self._message_service))
+        # GET TODO: implement handler
+        # router.add_route('/messages', MessageKeyHandler(self._message_service))
 
         return router
 
