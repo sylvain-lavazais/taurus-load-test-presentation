@@ -38,7 +38,7 @@ class MessageService:
         """
         try:
             message = self._repo.select(key)
-            self._repo.delete(message[key])
+            self._repo.delete(message['key'])
         except UnknownEntityIdError as unknown:
             return [{'error_code': {'UNKNOWN': 'entity unknown'}, 'error': str(unknown)}]
         except DeleteEntityError as delete:

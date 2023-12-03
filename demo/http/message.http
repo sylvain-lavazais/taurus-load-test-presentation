@@ -1,0 +1,45 @@
+### Create a new message
+POST http://localhost:8080/message
+Accept: application/json
+Content-Type: application/json
+
+{
+    "data": {
+      "key": "test_key",
+      "attributes": {
+        "property_1": "{{$random.alphabetic(10)}}",
+        "property_2": "{{$random.alphabetic(15)}}",
+        "property_3": "{{$random.alphabetic(20)}}",
+        "property_4": "{{$random.alphabetic(25)}}",
+        "property_5": "{{$random.alphabetic(30)}}"
+      }
+    }
+}
+
+### Read the new message
+GET http://localhost:8080/message/test_key
+Accept: application/json
+Content-Type: application/json
+
+### Update message
+PUT http://localhost:8080/message/test_key
+Accept: application/json
+Content-Type: application/json
+
+{
+    "data": {
+      "key": "test_key",
+      "attributes": {
+        "property_1": "{{$random.alphabetic(10)}}",
+        "property_2": "{{$random.alphabetic(15)}}",
+        "property_3": "{{$random.alphabetic(20)}}",
+        "property_4": "{{$random.alphabetic(25)}}",
+        "property_5": "{{$random.alphabetic(30)}}"
+      }
+    }
+}
+
+### Delete message
+DELETE http://localhost:8080/message/test_key
+Accept: application/json
+Content-Type: application/json

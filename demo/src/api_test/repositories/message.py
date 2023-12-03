@@ -9,10 +9,10 @@ from ..adapters.postgres import Postgres
 from ..decorator.logit import logit
 
 ENTITY_NAME: str = 'message'
-SELECT_FROM_KEY: str = '''SELECT key, attributes FROM deposit.message WHERE key = %(key)s'''
-DELETE_FROM_KEY: str = '''DELETE FROM deposit.message WHERE key = %(key)s'''
-UPDATE_FROM_KEY: str = '''UPDATE deposit.message SET attributes = %(attributes)s WHERE key = %(key)s'''
-INSERT: str = '''INSERT INTO deposit.message (key, attributes) VALUES (%(key)s, %(attributes)s)'''
+SELECT_FROM_KEY: str = '''SELECT key, attributes FROM message WHERE key = %(key)s'''
+DELETE_FROM_KEY: str = '''DELETE FROM message WHERE key = %(key)s'''
+UPDATE_FROM_KEY: str = '''UPDATE message SET attributes = %(attributes)s WHERE key = %(key)s'''
+INSERT: str = '''INSERT INTO message (key, attributes) VALUES (%(key)s, %(attributes)s)'''
 
 
 class MessageRepository:

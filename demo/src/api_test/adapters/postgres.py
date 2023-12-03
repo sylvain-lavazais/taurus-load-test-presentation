@@ -83,9 +83,10 @@ class Postgres:
                           migration_folder: str):
         try:
             self._log.debug('applying yoyo migration')
-            backend = get_backend(f'postgresql://{db_user}:{db_password}@'
-                                  f'{db_host}:{db_port}/{db_name}')
+            connection_string: str = f'postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}'
+            backend = get_backend(connection_string)
             self._log.debug(f'applying migration files in {migration_folder}')
+            self._log.debug(f'on connection {connection_string}')
             migrations = read_migrations(migration_folder)
             backend.apply_migrations(backend.to_apply(migrations))
         except Exception as error:
