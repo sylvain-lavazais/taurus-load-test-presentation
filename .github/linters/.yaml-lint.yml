@@ -1,0 +1,7 @@
+---
+
+extends: default
+
+ignore: |
+  .github
+  test
