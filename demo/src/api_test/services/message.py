@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple
+from typing import Dict, List, Tuple
 
 import structlog
 from structlog.typing import FilteringBoundLogger
@@ -76,7 +76,7 @@ class MessageService:
             message = self._repo.select(key)
             if 'key' in message:
                 return [{'error_code': {'CREATE': ENTITY_ALREADY_EXIST}, 'error': f'message already {key} exist'}]
-        except UnknownEntityIdError as _:
+        except UnknownEntityIdError:
             self._repo.create(attributes, key)
         except CreateEntityError as create:
             return [{'error_code': {'CREATE': 'creation error'}, 'error': str(create)}]

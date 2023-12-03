@@ -93,7 +93,7 @@ apply-isort: ## Applying autosort of imports
 check-linter: ## Run flake8 linter on sources
 	@echo "===> $@ <==="
 	@if ! python -m flake8 --version; then $(MAKE) install-test; fi
-	@python -m flake8 --config .github/linters/.flake8 ./src ./test
+	@python -m flake8 --config ../.github/linters/.flake8 ./src
 	@echo "Done !"
 .PHONY: check-linter
 

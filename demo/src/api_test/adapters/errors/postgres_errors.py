@@ -5,5 +5,6 @@ class PostgresConnectionError(Exception):
 class PostgresCursorError(Exception):
     pass
 
+
 class PostgresQueryError(Exception):
     pass
