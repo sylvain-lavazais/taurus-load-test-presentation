@@ -9,8 +9,12 @@ from psycopg2.pool import ThreadedConnectionPool
 from structlog.typing import FilteringBoundLogger
 from yoyo import get_backend, read_migrations
 
-from .errors.postgres_errors import PostgresConnectionError, PostgresCursorError, PostgresQueryError
 from .. import db
+from .errors.postgres_errors import (
+    PostgresConnectionError,
+    PostgresCursorError,
+    PostgresQueryError,
+)
 
 
 class Queries:

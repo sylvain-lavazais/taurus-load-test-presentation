@@ -1,6 +1,6 @@
 import falcon
 import pkg_resources
-from prometheus_client import generate_latest, CollectorRegistry, multiprocess
+from prometheus_client import CollectorRegistry, generate_latest, multiprocess
 
 from . import Handler
 

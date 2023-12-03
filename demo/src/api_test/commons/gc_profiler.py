@@ -1,6 +1,6 @@
 import time
 
-from prometheus_client import core, Gauge
+from prometheus_client import Gauge, core
 
 
 class GcProfiler:

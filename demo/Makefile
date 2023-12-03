@@ -86,7 +86,7 @@ test-and-report-sonar: install-test ## Run all tests and report for sonar (ci on
 apply-isort: ## Applying autosort of imports
 	@echo "===> $@ <==="
 	@if ! python -m isort > /dev/null; then $(MAKE) install-test; fi
-	@python -m isort ./src ./test --sp .github/linters/.isort.cfg
+	@python -m isort ./src --sp ../.github/linters/.isort.cfg
 	@echo "Done !"
 .PHONY: apply-isort
 

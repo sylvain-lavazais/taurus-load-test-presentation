@@ -1,10 +1,20 @@
-from falcon import Request, Response, HTTP_200, HTTP_404, HTTP_204, HTTP_400, HTTP_409, HTTP_500, HTTP_201
+from falcon import (
+    HTTP_200,
+    HTTP_201,
+    HTTP_204,
+    HTTP_400,
+    HTTP_404,
+    HTTP_409,
+    HTTP_500,
+    Request,
+    Response,
+)
 from falcon.errors import MediaMalformedError
 from structlog.typing import FilteringBoundLogger
 
-from . import Handler
 from ..models.message import MessageSchema
-from ..services.message import MessageService, ENTITY_ALREADY_EXIST
+from ..services.message import ENTITY_ALREADY_EXIST, MessageService
+from . import Handler
 
 
 class MessageKeyHandler(Handler):
