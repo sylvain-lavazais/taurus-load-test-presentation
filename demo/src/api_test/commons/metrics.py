@@ -1,7 +1,7 @@
 import gc
 import platform
 
-from prometheus_client import core, Gauge, REGISTRY, Counter, Histogram
+from prometheus_client import REGISTRY, Counter, Gauge, Histogram, core
 
 from .gc_profiler import GcProfiler, set_function_on_map_gauge
 

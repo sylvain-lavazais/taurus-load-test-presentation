@@ -1,9 +1,9 @@
-from falcon import HTTP_200, HTTP_503, Response, Request, HTTP_204
+from falcon import HTTP_200, HTTP_204, HTTP_503, Request, Response
 from structlog.typing import FilteringBoundLogger
 
-from . import Handler
-from ..models.health import HealthSchema, ReadinessSchema, LivenessSchema
+from ..models.health import HealthSchema, LivenessSchema, ReadinessSchema
 from ..services.health import HealthService
+from . import Handler
 
 
 class HealthHandler(Handler):

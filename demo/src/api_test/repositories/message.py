@@ -3,10 +3,15 @@ import json
 import structlog
 from structlog.typing import FilteringBoundLogger
 
-from .errors.repositories_errors import UnknownEntityIdError, DeleteEntityError, UpdateEntityError, CreateEntityError
 from ..adapters.errors.postgres_errors import PostgresQueryError
 from ..adapters.postgres import Postgres
 from ..decorator.logit import logit
+from .errors.repositories_errors import (
+    CreateEntityError,
+    DeleteEntityError,
+    UnknownEntityIdError,
+    UpdateEntityError,
+)
 
 ENTITY_NAME: str = 'message'
 SELECT_FROM_KEY: str = '''SELECT key, attributes FROM message WHERE key = %(key)s'''

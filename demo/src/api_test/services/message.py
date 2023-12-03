@@ -1,10 +1,14 @@
-from typing import Any, Dict, Tuple, List
+from typing import Any, Dict, List, Tuple
 
 import structlog
 from structlog.typing import FilteringBoundLogger
 
-from ..repositories.errors.repositories_errors import UnknownEntityIdError, DeleteEntityError, UpdateEntityError, \
-    CreateEntityError
+from ..repositories.errors.repositories_errors import (
+    CreateEntityError,
+    DeleteEntityError,
+    UnknownEntityIdError,
+    UpdateEntityError,
+)
 from ..repositories.message import MessageRepository
 
 ENTITY_ALREADY_EXIST: str = 'entity already exist'

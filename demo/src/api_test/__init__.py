@@ -11,14 +11,14 @@ from dynaconf import Dynaconf, LazySettings
 from falcon import App
 from structlog.typing import FilteringBoundLogger
 
+from .adapters.postgres import Postgres
 from .commons.metrics import Metrics
-from .handlers.health import HealthHandler, ReadinessHandler, LivenessHandler
-from .handlers.message import MessageKeyHandler, MessageHandler
+from .handlers.health import HealthHandler, LivenessHandler, ReadinessHandler
+from .handlers.message import MessageHandler, MessageKeyHandler
 from .handlers.monitoring import MonitoringHandler
 from .middlewares.prometheus import Prometheus
 from .middlewares.telemetry import Telemetry
 from .middlewares.tracking_id import TrackingId
-from .adapters.postgres import Postgres
 from .repositories.message import MessageRepository
 from .services.health import HealthService
 from .services.message import MessageService
