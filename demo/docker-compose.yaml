@@ -10,7 +10,7 @@ services:
       - db-vol:/var/lib/postgresql/data
     ports:
       - '5432:5432'
-    command: ['postgres', '-c', 'log_statement=all']
+#    command: ['postgres', '-c', 'log_statement=all']
     networks:
       - test-net
 
@@ -19,8 +19,6 @@ services:
 #    command:
 #      - '0.0.0.0'
 #      - '8080'
-#      - '--log_level'
-#      - 'DEBUG'
 #    environment:
 #      API_DB_USER_PASSWORD: 'dbpass'
 #      API_DB_HOST_NAME: 'database'

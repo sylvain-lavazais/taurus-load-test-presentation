@@ -1,0 +1,3 @@
+### ignore every folder generated
+2**/*
+jmeter.log

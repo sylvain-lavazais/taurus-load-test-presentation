@@ -1,5 +1,5 @@
 ### Create a new message
-POST http://localhost:8080/message
+POST http://{{host}}:8080/message
 Accept: application/json
 Content-Type: application/json
 
@@ -17,12 +17,12 @@ Content-Type: application/json
 }
 
 ### Read the new message
-GET http://localhost:8080/message/test_key
+GET http://{{host}}:8080/message/test_key
 Accept: application/json
 Content-Type: application/json
 
 ### Update message
-PUT http://localhost:8080/message/test_key
+PUT http://{{host}}:8080/message/test_key
 Accept: application/json
 Content-Type: application/json
 
@@ -40,6 +40,6 @@ Content-Type: application/json
 }
 
 ### Delete message
-DELETE http://localhost:8080/message/test_key
+DELETE http://{{host}}:8080/message/test_key
 Accept: application/json
 Content-Type: application/json

@@ -1,0 +1,135 @@
+{
+  "scenarios": {
+    "full_cycle": {
+      "keepalive": true,
+      "timeout": "1500ms",
+      "follow-redirects": true,
+      "user.language": "en",
+      "retrieve-resources": true,
+      "store-cache": false,
+      "use-dns-cache-mgr": true,
+      "store-cookie": false,
+      "default-address": "${__P(api-url)}",
+      "requests": [
+        {
+          "label": "create message",
+          "method": "POST",
+          "headers": {
+            "User-Agent": "JMeter/Taurus 1.16.26",
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          "url": "${__P(api-url)}/message",
+          "jsr223": [
+            {
+              "execute": "before",
+              "language": "java",
+              "script-text": "vars.put(\"random_key\", \"${__time()}${__threadNum}${__RandomString(5,abcdefghijklmnopqrstuvwxz0123456789)}\");",
+              "compile-cache": false
+            }
+          ],
+          "body": {
+            "data": {
+              "key": "${random_key}",
+              "attributes": {
+                "property_1": "${__RandomString(20,abcdefghijklmnopqrstuvwxz0123456789)}",
+                "property_2": "${__RandomString(20,abcdefghijklmnopqrstuvwxz0123456789)}",
+                "property_3": "${__RandomString(20,abcdefghijklmnopqrstuvwxz0123456789)}"
+              }
+            }
+          },
+          "assert": [
+            {
+              "contains": [
+                "201"
+              ],
+              "subject": "http-code",
+              "not": false
+            }
+          ]
+        },
+        {
+          "label": "read message",
+          "method": "GET",
+          "headers": {
+            "User-Agent": "JMeter/Taurus 1.16.26",
+            "Accept": "application/json"
+          },
+          "url": "${__P(api-url)}/message/${random_key}",
+          "assert": [
+            {
+              "contains": [
+                "200"
+              ],
+              "subject": "http-code",
+              "not": false
+            }
+          ],
+          "assert-jsonpath": [
+            {
+              "jsonpath": "$.data",
+              "expect-null": false,
+              "invert": false
+            },
+            {
+              "jsonpath": "$.data[0].key",
+              "expected-value": "${random_key}",
+              "expect-null": false,
+              "invert": false
+            },
+            {
+              "jsonpath": "$.data[0].attributes",
+              "expect-null": false,
+              "invert": false
+            }
+          ]
+        },
+        {
+          "label": "update message",
+          "method": "PUT",
+          "headers": {
+            "User-Agent": "JMeter/Taurus 1.16.26",
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          "url": "${__P(api-url)}/message/${random_key}",
+          "body": {
+            "data": {
+              "key": "${random_key}",
+              "attributes": {
+                "property_1": "${__RandomString(20,abcdefghijklmnopqrstuvwxz0123456789)}",
+                "property_2": "${__RandomString(20,abcdefghijklmnopqrstuvwxz0123456789)}",
+                "property_3": "${__RandomString(20,abcdefghijklmnopqrstuvwxz0123456789)}"
+              }
+            }
+          },
+          "assert": [
+            {
+              "contains": [
+                "204"
+              ],
+              "subject": "http-code",
+              "not": false
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "reporting": [
+    {
+      "module": "passfail",
+      "run-at": "cloud",
+      "criteria": [
+        "avg-rt>300ms"
+      ]
+    },
+    {
+      "module": "passfail",
+      "run-at": "local",
+      "criteria": [
+        "avg-rt>5s"
+      ]
+    }
+  ]
+}

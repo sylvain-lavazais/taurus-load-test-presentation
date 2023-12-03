@@ -98,8 +98,51 @@ check-linter: ## Run flake8 linter on sources
 .PHONY: check-linter
 
 ##  ----
+##@ Load test
+##  ----
+
+cloud-to-cloud: init ## Run load test scenarios on deployed solution with taurus cloud
+	@echo "===> $@ <==="
+	@docker run --rm \
+	-v $(PWD)/load/scenarios:/bzt-configs \
+	blazemeter/taurus:1.16.26 \
+	 -o modules.jmeter.properties.api-url=$(API_URL) \
+	 -o modules.cloud.detach=true \
+	 -o modules.cloud.workspace=$(BZT_WORKSPACE) \
+	 -o modules.cloud.project=$(BZT_PROJECT) \
+	 -o modules.cloud.account=$(BZT_ACCOUNT) \
+	 -o modules.cloud.test="$(BZT_COMPONENT)-cloud-to-cloud" \
+	 -o modules.cloud.token=$(BZT_TOKEN) \
+	 -o modules.cloud.report-name=$(REPORT) \
+	 cloud-execution.json  scenarios.json;
+.PHONY: cloud-to-cloud
+
+local-to-cloud: init .revolve-dep ## Run load test scenarios on preprod with taurus local
+	@echo "===> $@ <==="
+	cd load && \
+	python -m bzt \
+	 -o modules.jmeter.properties.api-url=$(API_URL) \
+	local-execution.json scenarios.json jmeter.yaml;
+	@cd ..
+.PHONY: local-to-cloud
+
+local-to-local: init .revolve-dep ## Run load test scenario1 on local with taurus local
+	@echo "===> $@ <==="
+	cd load && \
+	python -m bzt \
+	 -o modules.jmeter.properties.api-url=http://localhost:8080 \
+	local-execution.json scenarios.json jmeter.yaml;
+	@cd ..
+.PHONY: local-to-local
+
+##  ----
 ##@ Misc
 ##  ----
+
+init: ## initialize local env (does not override existing env file)
+	@echo "===> $@ <==="
+	@cp -n sample.env .env && echo "your .env file has been initialized, fulfill it..." || true
+.PHONY: init
 
 .revolve-dep:
 	@echo "===> $@ <==="

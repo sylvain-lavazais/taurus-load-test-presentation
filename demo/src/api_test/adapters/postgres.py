@@ -25,8 +25,13 @@ class Postgres:
     """
     Postgres Data Access Repository.
     """
-    _connection_pool: ThreadedConnectionPool
     _log: FilteringBoundLogger
+    _db_name: str
+    _db_user: str
+    _db_password: str
+    _db_host: str
+    _db_port: str
+
 
     def __init__(self,
                  host_name: str,
@@ -34,9 +39,7 @@ class Postgres:
                  database_name: str,
                  user_name: str,
                  password: str,
-                 migration_folder: str = os.path.dirname(os.path.abspath(db.__file__)),
-                 pool_min_connection: int = 2,
-                 pool_max_connection: int = 4):
+                 migration_folder: str = os.path.dirname(os.path.abspath(db.__file__))):
         """
         init a connection repository to postgres with a connection pool
 
@@ -50,25 +53,15 @@ class Postgres:
         :param pool_max_connection: maximum connections kept alive in the pool (default = 4)
         :raise PostgresConnectionError: on init of the class if the connection can't be established
         """
+        self._db_name = database_name
+        self._db_user = user_name
+        self._db_password = password
+        self._db_host = host_name
+        self._db_port = port_number
+
         self._log = structlog.get_logger()
 
         self._log.debug('init postgres repository')
-
-        # List of Kwargs passed in pools connection
-        #     - *dbname*: the database name
-        #     - *database*: the database name (only as keyword argument)
-        #     - *user*: user name used to authenticate
-        #     - *password*: password used to authenticate
-        #     - *host*: database host address (defaults to UNIX socket if not provided)
-        #     - *port*: connection port number (defaults to 5432 if not provided)
-
-        self._connection_pool = ThreadedConnectionPool(pool_min_connection,
-                                                       pool_max_connection,
-                                                       database=database_name,
-                                                       user=user_name,
-                                                       password=password,
-                                                       host=host_name,
-                                                       port=port_number)
 
         self.ping_select()
         self.__apply_migration(host_name,
@@ -114,17 +107,15 @@ class Postgres:
         :return: list of DictRow
         """
         log_query = query.replace('\n', '')
-        with self.__connection(f'read-{entity}') as conn:
-            try:
-                with self.__cursor(conn) as curs:
+        try:
+            with self.__db_connection() as conn:
+                with conn.cursor(cursor_factory=DictCursor) as curs:
                     curs.execute(query, params)
                     self._log.debug(f'executing query [{log_query}]')
                     self._log.debug(f'with param [{params}]')
                     return curs.fetchall()
-            except psycopg2.Error as error:
-                self._log.warn(f'Error occur on read of {log_query} - {error}')
-            finally:
-                self._connection_pool.putconn(conn)
+        except psycopg2.Error as error:
+            self._log.warn(f'Error occur on read of {log_query} - {error}')
 
     def exec_write(self, entity: str, query: str, params: dict) -> None:
         """
@@ -135,39 +126,27 @@ class Postgres:
         :raise PostgresQueryError: on error during writing process
         """
         log_query = query.replace('\n', '')
-        with self.__connection(f'write-{entity}') as conn:
-            try:
-                with self.__cursor(conn) as curs:
+        try:
+            with self.__db_connection() as conn:
+                with conn.cursor(cursor_factory=DictCursor) as curs:
                     curs.execute(query, params)
                     self._log.debug(f'executing query [{log_query}]')
                 conn.commit()
-            except psycopg2.Error as error:
-                self._log.error(f'Error occur on write of {log_query} - {error}')
-                conn.rollback()
-                raise PostgresQueryError(f'Error occur on write of {log_query} - {error}')
-            finally:
-                self._connection_pool.putconn(conn)
+        except psycopg2.Error as error:
+            self._log.error(f'Error occur on write of {log_query} - {error}')
+            conn.rollback()
+            raise PostgresQueryError(f'Error occur on write of {log_query} - {error}')
 
-    @contextmanager
-    def __connection(self, key: str) -> DictConnection:
+    def __db_connection(self):
         try:
-            conn: DictConnection
-            with self._connection_pool.getconn(key) as conn:
-                yield conn
-        except psycopg2.Error as pg_error:
-            self._log.critical(f'error happen on getting db connection with key {key} : {pg_error}')
-            raise PostgresConnectionError(f'getting db connection with key {key} : {pg_error}')
+            params = {
+                    'database': self._db_name,
+                    'user'    : self._db_user,
+                    'password': self._db_password,
+                    'host'    : self._db_host,
+                    'port'    : self._db_port
+            }
+            return psycopg2.connect(**params)
+        except (Exception, psycopg2.DatabaseError) as error:
+            self._log.critical(f'Error occur on connection to database - \n {error}')
 
-    @contextmanager
-    def __cursor(self, conn: DictConnection) -> DictCursor:
-        try:
-            cursor: DictCursor
-            with conn.cursor() as cursor:
-                yield cursor
-        except psycopg2.Error as pg_error:
-            self._log.critical(f'error happen on getting db cursor : {pg_error}')
-            raise PostgresCursorError(f'getting db cursor : {pg_error}')
-
-    def get_used_connections(self) -> int:
-        """ Returns the current database connections used."""
-        return len(self._connection_pool._pool)

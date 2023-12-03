@@ -46,9 +46,7 @@ class APITest:
                                  settings.db_port_number,
                                  settings.db_database_name,
                                  settings.db_user_name,
-                                 settings.db_user_password,
-                                 pool_min_connection=settings.db_pool_min_connection,
-                                 pool_max_connection=settings.db_pool_max_connection)
+                                 settings.db_user_password)
         self._log.debug(f'Initialize Database component on {settings.db_host_name} - Done')
         return dal
 
