@@ -14,16 +14,21 @@ services:
     networks:
       - test-net
 
-  app:
-    image: docker.io/slavazais/api-test:latest
-    environment:
-      API_DB_USER_PASSWORD: 'dbpass'
-      API_DB_HOST_NAME: 'database'
-      API_ENV: 'prod'
-    ports:
-      - '8080:8080'
-    networks:
-      - test-net
+#  app:
+#    image: docker.io/slavazais/api-test:latest
+#    command:
+#      - '0.0.0.0'
+#      - '8080'
+#      - '--log_level'
+#      - 'DEBUG'
+#    environment:
+#      API_DB_USER_PASSWORD: 'dbpass'
+#      API_DB_HOST_NAME: 'database'
+#      API_ENV: 'prod'
+#    ports:
+#      - '8080:8080'
+#    networks:
+#      - test-net
 
 networks:
   test-net:
