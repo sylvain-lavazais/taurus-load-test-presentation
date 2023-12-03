@@ -1,4 +1,3 @@
-import signal
 import socket
 import time
 from multiprocessing import Manager
@@ -33,7 +32,7 @@ class HealthService(Thread):
     @property
     def interrupt(self) -> bool:
         return self._interrupt
-    
+
     @interrupt.setter
     def interrupt(self, value: bool):
         self._interrupt = value

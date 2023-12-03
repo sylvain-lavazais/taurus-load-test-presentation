@@ -5,7 +5,8 @@ import structlog
 
 class GunicornLogger(object):
     """
-    A stripped-down version of https://github.com/benoitc/gunicorn/blob/master/gunicorn/glogging.py to provide structlog logging in gunicorn
+    A stripped-down version of https://github.com/benoitc/gunicorn/blob/master/gunicorn/glogging.py
+    to provide structlog logging in gunicorn
     Modified from http://stevetarver.github.io/2017/05/10/python-falcon-logging.html
     """
 
