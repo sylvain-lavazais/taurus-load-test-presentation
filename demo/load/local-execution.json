@@ -3,8 +3,8 @@
     {
       "concurrency": 100,
       "throughput": 200,
-      "ramp-up": "2m",
-      "hold-for": "13m",
+      "ramp-up": "15m",
+      "hold-for": "1h",
       "steps": 5,
       "scenario": "full_cycle"
     }

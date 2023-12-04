@@ -103,18 +103,18 @@ check-linter: ## Run flake8 linter on sources
 
 cloud-to-cloud: init ## Run load test scenarios on deployed solution with taurus cloud
 	@echo "===> $@ <==="
-	@docker run --rm \
-	-v $(PWD)/load/scenarios:/bzt-configs \
+	docker run --rm \
+	-v $(PWD)/load:/bzt-configs \
 	blazemeter/taurus:1.16.26 \
-	 -o modules.jmeter.properties.api-url=$(API_URL) \
-	 -o modules.cloud.detach=true \
-	 -o modules.cloud.workspace=$(BZT_WORKSPACE) \
-	 -o modules.cloud.project=$(BZT_PROJECT) \
-	 -o modules.cloud.account=$(BZT_ACCOUNT) \
-	 -o modules.cloud.test="$(BZT_COMPONENT)-cloud-to-cloud" \
-	 -o modules.cloud.token=$(BZT_TOKEN) \
-	 -o modules.cloud.report-name=$(REPORT) \
-	 cloud-execution.json  scenarios.json;
+	-o modules.jmeter.properties.api-url=$(API_URL) \
+	-o modules.cloud.detach=true \
+	-o modules.cloud.workspace=$(BZT_WORKSPACE) \
+	-o modules.cloud.project=$(BZT_PROJECT) \
+	-o modules.cloud.account=$(BZT_ACCOUNT) \
+	-o modules.cloud.test="$(BZT_COMPONENT)-cloud-to-cloud" \
+	-o modules.cloud.token=$(BZT_TOKEN) \
+	cloud-execution.json  scenarios.json;
+	@cd ..
 .PHONY: cloud-to-cloud
 
 local-to-cloud: init .revolve-dep ## Run load test scenarios on preprod with taurus local

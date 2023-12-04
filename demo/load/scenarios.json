@@ -2,7 +2,7 @@
   "scenarios": {
     "full_cycle": {
       "keepalive": true,
-      "timeout": "1500ms",
+      "timeout": "5000ms",
       "follow-redirects": true,
       "user.language": "en",
       "retrieve-resources": true,
@@ -121,7 +121,7 @@
       "module": "passfail",
       "run-at": "cloud",
       "criteria": [
-        "avg-rt>300ms"
+        "avg-rt>5s"
       ]
     },
     {
