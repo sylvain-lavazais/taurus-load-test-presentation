@@ -103,7 +103,7 @@ check-linter: ## Run flake8 linter on sources
 
 cloud-to-cloud: init ## Run load test scenarios on deployed solution with taurus cloud
 	@echo "===> $@ <==="
-	docker run --rm \
+	@docker run --rm \
 	-v $(PWD)/load:/bzt-configs \
 	blazemeter/taurus:1.16.26 \
 	-o modules.jmeter.properties.api-url=$(API_URL) \

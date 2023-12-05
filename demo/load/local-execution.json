@@ -1,10 +1,10 @@
 {
   "execution": [
     {
-      "concurrency": 100,
+      "concurrency": 50,
       "throughput": 200,
-      "ramp-up": "15m",
-      "hold-for": "1h",
+      "ramp-up": "2m",
+      "hold-for": "18m",
       "steps": 5,
       "scenario": "full_cycle"
     }
