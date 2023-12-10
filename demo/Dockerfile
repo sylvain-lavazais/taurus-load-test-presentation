@@ -1,4 +1,4 @@
-FROM python:3.12-slim AS builder
+FROM python:3.12 AS builder
 
 COPY . /build
 
@@ -11,7 +11,7 @@ RUN apt-get update && \
 
 RUN pip install .
 
-FROM python:3.12-slim
+FROM python:3.12
 
 RUN apt-get update && \
     apt-get install -y libpq-dev && \

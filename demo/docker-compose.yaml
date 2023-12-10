@@ -15,10 +15,12 @@ services:
       - test-net
 
 #  app:
-#    image: docker.io/slavazais/api-test:latest
+#    image: docker.io/slavazais/api-test:1.1.0-arm
 #    command:
 #      - '0.0.0.0'
 #      - '8080'
+#      - '--log_level'
+#      - 'ERROR'
 #    environment:
 #      API_DB_USER_PASSWORD: 'dbpass'
 #      API_DB_HOST_NAME: 'database'
